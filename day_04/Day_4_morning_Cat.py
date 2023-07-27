@@ -36,7 +36,7 @@ Using panda dataframe to read a csv file and doing some simple data manipulation
 # Importing the required packages
 import pandas as pd
 
-csv_path = 'Data/jena_climate_2009_2016/jena_climate_2009_2016.csv'
+csv_path = 'jena_climate_2009_2016/jena_climate_2009_2016.csv'
 df = pd.read_csv(csv_path)
 
 #%%
@@ -44,15 +44,23 @@ df = pd.read_csv(csv_path)
 TODO: Introduction to dataframe; data slicing, removing data from the 
 dataframe, assessing first and last n-th elements
 """
-
+print(df.tail)
+date_time = pd.to_datetime(df.pop('Date Time'), format='%d.%m.%Y %H:%M:%S')
+print(date_time)
+print(df)
 #%%
 """
 Plot a subset of data from the dataframe
 """
 
 plot_cols = ['T (degC)', 'p (mbar)', 'rho (g/m**3)']
-
-
+plot_features = df[plot_cols]
+plot_features.index = date_time
+print(plot_features)
+_ = plot_features.plot(subplots=True)
+plot_features = df[plot_cols][:480]
+plot_features.index = date_time[:480]
+_ = plot_features.plot(subplots=True)
 #%%
 """
 Quickly visualize the statistic of our data
@@ -66,16 +74,50 @@ and max. wv has unrealistic values (-9999). These outliers need to be removed
 from our data by substituting with an interpolated value.
 """
 
+wv = df['wv (m/s)']
+bad_wv = wv == -9999.0
+wv[bad_wv] = 0.0 #CHANGE TO INTERPOLATE
+
+max_wv = df['max. wv (m/s)']
+bad_max_wv = max_wv == -9999.0
+max_wv[bad_max_wv] = 0.0 
+
+df['wv (m/s)'].min()
+
+
+#replace with interpolated data
+import numpy as np
+from scipy import interpolate
+
+# interp_func_1D = interpolate.interp1d(x,y)
+# ynew = interp_func_1D(xnew)
+# x--wv.index  and then use wv.to_numpy() for y
+# then for the three bad data period, get interpolated value
+#then replace data into the data
 
 #%%
 """
 TODO: Generating histogram and heatmap (2D histogram)
 """
+import matplotlib.pyplot as plt
 
+fig, axs = plt.subplots((1))
+plt.hist(df['wd (deg)'])
+plt.xlabel('wind direction (deg)')
+plt.ylabel('number of times happened')
+plt.grid()
+plt.show()
 #%%
 """
 TODO: Generating heatmap (2D histogram)
 """
+import matplotlib.pyplot as plt
+
+fig, axs = plt.subplots((1))
+plt.hist2d(df['wd (deg)'], df['wv (m/s)'], bins = (50,50))
+plt.xlabel('wind direction (deg)')
+plt.ylabel('speed')
+plt.show()
 
 
 #%%
