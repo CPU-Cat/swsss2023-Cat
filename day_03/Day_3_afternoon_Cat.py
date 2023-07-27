@@ -350,7 +350,27 @@ from scipy import interpolate
 x = np.arange(0, 10)
 y = np.exp(-x/3.0)
 
+interp_func_1D = interpolate.interp1d(x,y)
 
+xnew = np.arange(0,9,0.1)
+ynew = interp_func_1D(xnew)
+#%%
+
+interp_func_1D_cubic = interpolate.interp1d(x,y,kind = 'cubic')
+ycubic = interp_func_1D_cubic(xnew)
+interp_func_1D_quadratic = interpolate.interp1d(x,y,kind = 'quadratic')
+yquadratic = interp_func_1D_quadratic(xnew)
+
+fig = plt.figure()
+plt.subplots(1, figsize=(10,6))
+plt.plot(x,y, 'o', xnew, ynew, '*', xnew, ycubic, '--', xnew, yquadratic, '--', linewidth = 2)
+plt.legend(['Inital Points','Interpolated line-linear','Interpolated line-cubic','Interpolated line-quadratic'], fontsize = 16)
+plt.xlabel('x', fontsize=18)
+plt.ylabel('y', fontsize=18)
+plt.title('1D interpolation', fontsize=18)
+plt.grid()
+plt.tick_params(axis = 'both', which = 'major', labelsize = 16)
+plt.show()
 #%%
 """
 Data Interpolation (3D)
@@ -371,6 +391,12 @@ xg, yg ,zg = np.meshgrid(x, y, z, indexing='ij', sparse=True)
 
 sample_data = function_1(xg, yg, zg)
 
+interpolated_function_1 = RegularGridInterpolator((x,y,z),sample_data)
+
+# sample for testing
+pts = np.array([[2.1, 6.2, 8.3], [3.3, 5.2, 7.1]])
+print('Using interpolation method:',interpolated_function_1(pts)) 
+print('From true function:',function_1(pts[:,0],pts[:,1],pts[:,2]))
 
 #%%
 """
@@ -396,21 +422,57 @@ Use 3D interpolation to evaluate the TIE-GCM density field at 400 KM on
 February 1st, 2002, with the discretized grid used for the JB2008 
 ((nofLst_JB2008,nofLat_JB2008,nofAlt_JB2008).
 """
+print("tiegcm: ", altitudes_tiegcm)
+print("jb2008: ", altitudes_JB2008)
+
+#LST x LAT x ALT
+time_index = 31*24
+tiegcm_data_feb1 = tiegcm_dens_reshaped[:,:,:,time_index]
+LST = localSolarTimes_tiegcm
+LAT = latitudes_tiegcm
+ALT = altitudes_tiegcm
+interpolated_function_TIEGCM = RegularGridInterpolator((LST,LAT,ALT), tiegcm_data_feb1, bounds_error = False, fill_value = None)
 
 
+alt = 400
+hi = np.where(altitudes_JB2008==alt) #outputs location of things
+just_match_hi_4d = JB2008_dens_reshaped[:,:,hi,time_index]
+amplitude_0 = just_match_hi_4d.squeeze()
+amplitude = amplitude_0.T
+lst = localSolarTimes_JB2008
+lat = latitudes_JB2008
 
+# tieinterp_amplitude = np.zeros((len(lst), len(lat)))
+# for lsti in range(len(lst)):
+#     for lati in range(len(lat)):
+#         tieinterp_amplitude[lsti,lati] =interpolated_function_TIEGCM((lst[lsti], lat[lati], 400))
+# # print(tieinterp_amplitude)
+locationgrid = np.meshgrid(lst, lat,400)
+gridrefine = np.array(locationgrid).squeeze()
+tieinterp_amplitude =interpolated_function_TIEGCM(gridrefine.T)
 
+print(tieinterp_amplitude.shape)
+print(amplitude.shape)
+
+fig, ax = plt.subplots((2))
+cntr0 = ax[0].contourf(lst, lat, amplitude) #plot latititude y and LST x
+cntr1 = ax[1].contourf(lst, lat, tieinterp_amplitude.T)
+cbar0 = fig.colorbar(cntr0, ax= ax[0])
+cbar1 = fig.colorbar(cntr1, ax= ax[1])
+plt.show()
 
 #%%
 """
 Assignment 2 (b)
-
 Now, let's find the difference between both density models and plot out this 
 difference in a contour plot.
 """
+amplitudediff = tieinterp_amplitude.T - amplitude
+fig, axs = plt.subplots((1))
+cntr0 = axs.contourf(lst, lat, amplitudediff) #plot latititude y and LST x
+cbar0 = fig.colorbar(cntr0, ax= axs)
 
-
-
+plt.show()
 
 
 #%%
@@ -423,8 +485,12 @@ for this scenario.
 
 APE = abs(tiegcm_dens-JB2008_dens)/tiegcm_dens
 """
+tieinterp_amp_T = tieinterp_amplitude.T 
+absamplitudediff = abs(tieinterp_amp_T- amplitude)/tieinterp_amp_T
+fig, axs = plt.subplots((1))
+cntr0 = axs.contourf(lst, lat, absamplitudediff) #plot latititude y and LST x
+cbar0 = fig.colorbar(cntr0, ax= axs)
+print(np.mean(absamplitudediff))
+plt.show()
 
-
-
-
-
+# %%

@@ -137,5 +137,4 @@ if __name__ == '__main__':
     #         stormendindex.append(datapoints_index)
     # print("number of times stormstarts and ends: ", len(stormstart), len(stormend))
     # print(stormstart[0], stormend[0])
-
-   plt.show()
+    plt.show()
