@@ -86,7 +86,7 @@ with open("day_02/omni_min_def_eMyN4ZWsFs.lst") as f:
 # print(symh)
 # print(hour)
 # print(minute)
-
+print(times)
 fig = plt.figure()
 plt.plot(times, symh)
 plt.xlabel("time")
