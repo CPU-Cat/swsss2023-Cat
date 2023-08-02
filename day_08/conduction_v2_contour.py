@@ -21,10 +21,8 @@ if __name__ == "__main__":
     x = np.arange(-dx, 10 + 2 * dx, dx)
     nPts = len(x)
     # print(x)
-
     t_lower = 200.0
     # t_upper = 1000.0
-
     # set default coefficients for the solver:
     a = np.zeros(nPts) - 1
     b = np.zeros(nPts) + 2
@@ -36,14 +34,10 @@ if __name__ == "__main__":
     dt = 1 #hours
     times = np.arange (0, nDays*24, dt)
     lon = 0.0
-
-    fig = plt.figure(figsize = (10,10))
-    ax = fig.add_subplot(111)
-
-    for hour in times:
-        UT = hour%24
+    temp_contf = np.zeros((len(times), nPts))
+    for hour in range(len(times)):
+        UT = times[hour]%24
         localtime = lon/15+UT #grenich time
-
         Qbkg = np.zeros(nPts)
         xstart_index = int(3/dx+dx) #x = 3 --> index is int(3/dx+dx)
         xend_index = int(7/dx+dx) #x = 7
@@ -75,15 +69,26 @@ if __name__ == "__main__":
         
         # solve for Temperature:
         t = solve_tridiagonal(a, b, c, d)
-        ax.plot(x, t, '--', label = str(hour))
+        temp_contf[hour] = t
 
-    # plot:
-    plt.xlabel('altitude')
-    plt.ylabel('Temp')
-    plt.legend(prop = {'size': 4})
-    plotfile = 'conduction_v1_timedep.png'
+
+
+
+    time_contf, alt_contf = np.meshgrid(times, x)
+
+
+    fig = plt.figure(figsize = (10,10))
+    ax = fig.add_subplot(111)
+    cs = ax.contourf(time_contf, alt_contf, temp_contf.T)
+    cbar = fig.colorbar(cs)
+    cbar.ax.set_ylabel('temperature [K]')
+    plt.xlabel('time [days]')
+    plt.ylabel('altitude [not km lol]')
+    plotfile = 'conduction_v1_contour.png'
     print('writing : ',plotfile)    
     fig.savefig(plotfile)
+
+
     plt.show()
     plt.close()
     
