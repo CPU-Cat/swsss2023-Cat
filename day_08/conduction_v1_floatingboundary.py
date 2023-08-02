@@ -32,11 +32,11 @@ if __name__ == "__main__":
     c[0] = 0
     d[0] = t_lower
 
-    # top - fixed:
-    a[-1] = 0
-    b[-1] = 1
+    # top - floating:
+    a[-1] = 1
+    b[-1] = -1
     c[-1] = 0
-    d[-1] = t_upper
+    d[-1] = 0 #t_upper
 
     # Add a source term:
     
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     ax.plot(x, t)
 
-    plotfile = 'conduction_v1.png'
+    plotfile = 'conduction_v1_floating.png'
     print('writing : ',plotfile)    
     fig.savefig(plotfile)
     plt.show()
