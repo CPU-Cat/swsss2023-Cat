@@ -12,6 +12,10 @@ import runge_kutta as rk
 #    k - numpy array carrying the rate coefficients k1 = 100, k2=0.25, k3=1
 #    c_0 - initial composition, i.e., c_0(A) = 1, c_0(B)=c_0(C)=0.0
 
+S = np.array([[-1,0,0],[1,-1,1],[0,2,-2]])
+k = np.array([100, 0.25, 1])
+c_0 = np.array([1,0,0])
+
 def reaction_rates(c,k):
     """
         Function implementing the reaction rate computation of our toy reactor
@@ -23,7 +27,8 @@ def reaction_rates(c,k):
         outputs:
             reaction rates (numpy array)
     """
-    return ... # please complete this function
+    rxnratearray = [c[0]*k[0],c[1]*k[1],c[2]**2*k[2]]
+    return rxnratearray # please complete this function
 
 def reactor(c,t,k,S):
     """
@@ -38,7 +43,9 @@ def reactor(c,t,k,S):
         outputs: 
             dc/dt - numpy array
     """
-    return ... # please complete this function
+    reac = reaction_rates(c,k)
+    RHS = np.dot(S,reac)
+    return RHS 
 
 # Please play around with the step size to study the effect on the solution
 h = 1e-3
@@ -93,3 +100,6 @@ for i in range(3):
             label = species_names[i])
 ax.legend()
 fig.savefig("zoomed_concentration_traces.pdf")
+
+plt.show()
+plt.close()

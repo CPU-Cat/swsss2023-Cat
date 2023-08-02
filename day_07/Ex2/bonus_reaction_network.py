@@ -12,8 +12,9 @@ import runge_kutta as rk
 #    k - numpy array carrying the rate coefficients k1 = 1, k2 = 2, k3=1
 #    c_0 - initial composition, i.e., c_0(X) = 1.0, c_0(Y)= 0.25, C_0(P) = 0.0
 
-
-
+S = np.array([[1,-1,0],[0,1,-1],[0,0,1]])
+k = np.array([1,2,1])
+c_0 = np.array([1.0, 0.25, 0.0])
 # reaction network 
 # A+X --> 2X
 # X + Y --> 2Y
@@ -31,7 +32,7 @@ def reaction_rates(c,k):
         outputs:
             reaction rates (numpy array)
     """
-    return ... # please complete according to the given reaction network 
+    return np.array([k[0]*c[0], k[1]*c[0]*c[1], k[2]*c[1]]) # please complete according to the given reaction network 
 
 def reactor(c,t,k,S):
     """
@@ -47,7 +48,7 @@ def reactor(c,t,k,S):
             dc/dt - numpy array
     """
     
-    return ... # please complete this function
+    return S @ reaction_rates(c,k) # please complete this function
 
 # Please play around with the step size to study the effect on the solution
 h = 1e-2
@@ -84,3 +85,5 @@ for i in range(2):
 ax.legend(loc="center right")
 fig.savefig("concentration_traces.pdf")
 
+plt.show()
+plt.close()
