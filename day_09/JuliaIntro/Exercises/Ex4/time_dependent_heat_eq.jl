@@ -19,17 +19,17 @@ Q_heat[round(Int, N/3):round(Int, 2N/3)] .= sun_heat
 function dTdt(T, p, t)
     λ, Tlower, Δx = p
 
-    fac = 1.0 # or max(cos(t),0) if you want time dependence
-    
+    #fac = 1.0 # or max(cos(t),0) if you want time dependence
+    fac =  max(cos(t),0)
     Qeuv = fac*Q_heat + Q_back 
 
     dT = zeros(length(T))
 
-    dT[1] = # here you need to add the finite difference approximation for the 1st grid point
+    dT[1] = λ/Δx^2*(T[2]-2T[1]+Tlower)+Qeuv[1]# here you need to add the finite difference approximation for the 1st grid point
     for i in 2:length(T)-1
-        dT[i] = # here you need to add the finite difference approximation for the ith grid point
+        dT[i] = λ/Δx^2*(T[i+1]-2*T[i]+T[i-1])+Qeuv[i]# here you need to add the finite difference approximation for the ith grid point
     end
-    dT[N] = # here you need to add the finite difference approximation for the ith grid point
+    dT[N] = λ/Δx^2*(-T[N]+T[N-1])+Qeuv[N]# here you need to add the finite difference approximation for the ith grid point
 
     return dT
 end
@@ -58,7 +58,7 @@ function generate_movie(sol, steps = 1000)
     T_profile = CM.Observable(sol(0.0))
     CM.lines!(ax, x_range, T_profile, color = :black, linewidth = 2)
     
-    CM.record(fig, string(@__DIR__, "/movie.mp4"), t_range, framerate=80) do t
+    CM.record(fig, string(@__DIR__, "/catmovie.mp4"), t_range, framerate=80) do t
         T_profile[] = sol(t)
     end 
 end

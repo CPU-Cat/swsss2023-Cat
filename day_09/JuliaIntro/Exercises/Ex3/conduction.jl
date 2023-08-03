@@ -18,11 +18,10 @@ fac = max(cos(0.0),0) # time factor for sun heating
 Q = zeros(N)
 Q[round(Int, N/3):round(Int, 2N/3)] .= fac*sun_heat + background_heat
 
-
 # with the nomenclature from yesterday:
 # Recall the meaning of A, B, C and D,
 # a is the first subdiagonal, b is the diagonal and c is the first superdiagonal.
-a = ...      # [1, ..., 1] this vector should have length N+1
+a =       # [1, ..., 1] this vector should have length N+1
 b = ...      # [1, -2, ..., -2, 1] this vector should have length N+2
 c = ...      # [0, 1, ..., 1] this vector should have length N+1
 d = ...      # [200, -Q[1]*Δx^2/λ, ..., -Q[N]*Δx^2/λ, 0] this vector should haave length N+2

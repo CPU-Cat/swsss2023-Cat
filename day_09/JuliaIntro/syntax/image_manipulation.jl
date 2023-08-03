@@ -8,7 +8,7 @@ philip = load("philip.png")
 head = philip[470:800, 140:410]
 
 # downsample philip
-grainy_philip = philip[1:2:end, 1:2:end]
+grainy_philip = philip[1:3:end, 1:3:end]
 
 # two philipss
 two_philip = [philip philip]
